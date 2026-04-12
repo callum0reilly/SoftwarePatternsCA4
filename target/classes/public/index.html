@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spark App</title>
+</head>
+<body>
+
+<h1>Simple Spark App</h1>
+
+<!-- call backend -->
+<button onclick="sayHello()">Call Backend</button>
+<p id="result"></p>
+
+<!-- form -->
+<form action="/submit" method="post">
+    <input type="text" name="name" placeholder="Enter name" />
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    function sayHello() {
+        fetch('/hello')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById("result").innerText = data;
+            });
+    }
+</script>
+
+</body>
+</html>
