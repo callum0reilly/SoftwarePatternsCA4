@@ -9,13 +9,22 @@ public class Main {
         //connect to HTML files
         staticFiles.location("/public");
 
-        get("/hello", (req, res) -> "Hello from backend");
+        post("/login",(req,res) -> {
+            String username = req.queryParams("username");
+            String password = req.queryParams("password");
+            UserService userService = UserService.getInstance();
 
-        post("/submit", (req, res) -> {
-            String name = req.queryParams("name");
-            return "Hello " + name;
+            User user = userService.findUser(username);
+
+            if (user != null && user.getPassword().equals(password)) {
+                res.redirect("/ShoppingHomePage.html");
+                return null ;
+            } else {
+                return "Invalid username or password";
+            }
+
         });
-    }
-}
+    }//end of main method
+}//end of class
 
 //http://localhost:8080
