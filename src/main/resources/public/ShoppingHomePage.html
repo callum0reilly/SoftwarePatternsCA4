@@ -2,9 +2,21 @@
 <html>
 <head>
     <title>Home page</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 <h1>Home page</h1>
+<form action="/products" method="get">
+    <input type="text" name="search" placeholder="Search products">
+
+    <select name="sort">
+        <option value="none">No Sort</option>
+        <option value="asc">Price Asc</option>
+        <option value="desc">Price Desc</option>
+    </select>
+
+    <button type="submit">Search</button>
+</form>
 </body>
 </html>
