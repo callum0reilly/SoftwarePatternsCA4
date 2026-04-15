@@ -60,9 +60,60 @@ public class Main {
             }
 
             //display them
-            String html = "<h2>Products</h2>";
+            String html = "<html><head><link rel='stylesheet' href='style.css'></head><body>";
+
+            html += "<h1>Home page</h1>";
+
+            html += "<a href='/cart'>View Cart</a><br><br>";
+
+            html += "<form action='/products' method='get'>" +
+                    "<input type='text' name='search' placeholder='Search products'>" +
+                    "<select name='sort'>" +
+                    "<option value='none'>No Sort</option>" +
+                    "<option value='asc'>Price Asc</option>" +
+                    "<option value='desc'>Price Desc</option>" +
+                    "</select>" +
+                    "<button type='submit'>Search</button>" +
+                    "</form>";
+
+            html += "<h2>Products</h2>";
 
             for (Product p : products) {
+                html += "<form action='/add-to-cart' method='post'>" +
+                        "<input type='hidden' name='title' value='" + p.getTitle() + "'>" +
+                        "<p>" + p.getTitle() + " - €" + p.getPrice() + "</p>" +
+                        "<button type='submit'>Add to Cart</button>" +
+                        "</form>";
+            }
+
+            return html;
+        });
+
+        post("/add-to-cart", (req, res) -> {
+
+            String title = req.queryParams("title");
+
+            ProductService ps = ProductService.getInstance();
+            CartService cs = CartService.getInstance();
+
+            for (Product p : ps.getProducts()) {
+                if (p.getTitle().equals(title)) {
+                    cs.add(p);
+                    break;
+                }
+            }
+
+            res.redirect("/products");
+            return null;
+        });
+
+        get("/cart", (req, res) -> {
+
+            List<Product> cart = CartService.getInstance().getCart();
+
+            String html = "<h1>Cart</h1>";
+
+            for (Product p : cart) {
                 html += "<p>" + p.getTitle() + " - €" + p.getPrice() + "</p>";
             }
 
