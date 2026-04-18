@@ -112,12 +112,28 @@ public class Main {
             List<Product> cart = CartService.getInstance().getCart();
 
             String html = "<h1>Cart</h1>";
+            html += "<a href='/products'>Back</a><br><br>";
 
             for (Product p : cart) {
                 html += "<p>" + p.getTitle() + " - €" + p.getPrice() + "</p>";
             }
 
+            html += "<form action='/checkout' method='post'>" +
+                    "<button type='submit'>Checkout</button>" +
+                    "</form>";
+
             return html;
+        });
+
+        post("/checkout", (req, res) -> {
+
+            CartService cs = CartService.getInstance();
+
+            Command checkout = new CheckoutCommand(cs.getCart());
+
+            checkout.execute();
+
+            return "<h1>Purchase successful</h1><a href='/products'>Continue Shopping</a>";
         });
     }//end of main method
 }//end of class
