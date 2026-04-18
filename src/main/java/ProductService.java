@@ -1,16 +1,16 @@
 import java.util.*;
-
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 
 public class ProductService {
 
     private static ProductService instance;
-    private List<Product> products;
+    private MongoCollection<Document> collection;
 
     private ProductService() {
-        products = new ArrayList<>();
-        products.add(new Product("Tshirt", 25,10));
-        products.add(new Product("Hoodie", 50,3));
-        products.add(new Product("Jacket", 120,1));
+        MongoDatabase db = MongoDBConnection.getInstance().getDatabase();
+        collection = db.getCollection("products");
     }
 
     public static ProductService getInstance() {
@@ -21,6 +21,23 @@ public class ProductService {
     }
 
     public List<Product> getProducts() {
+
+        List<Product> products = new ArrayList<>();
+
+        for (Document doc : collection.find()) {
+            String title = doc.getString("title");
+            double price = ((Number) doc.get("price")).doubleValue();
+            int stock = ((Number) doc.get("stock")).intValue();
+
+            products.add(new Product(title, price, stock));
+        }
         return products;
+    }//end of getProducts
+
+    public void updateStock(String title, int newStock) {
+        collection.updateOne(
+                new Document("title", title),
+                new Document("$set", new Document("stock", newStock))
+        );
     }
 }
