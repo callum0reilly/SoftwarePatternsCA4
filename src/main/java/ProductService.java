@@ -8,9 +8,9 @@ public class ProductService {
 
     private ProductService() {
         products = new ArrayList<>();
-        products.add(new Product("Tshirt", 25));
-        products.add(new Product("Hoodie", 50));
-        products.add(new Product("Jacket", 120));
+        products.add(new Product("Tshirt", 25,10));
+        products.add(new Product("Hoodie", 50,3));
+        products.add(new Product("Jacket", 120,1));
     }
 
     public static ProductService getInstance() {
