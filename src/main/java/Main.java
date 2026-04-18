@@ -131,9 +131,12 @@ public class Main {
 
             Command checkout = new CheckoutCommand(cs.getCart());
 
-            checkout.execute();
-
-            return "<h1>Purchase successful</h1><a href='/products'>Continue Shopping</a>";
+            try {
+                checkout.execute();
+                return "<h1>Purchase successful</h1><a href='/products'>Continue</a>";
+            } catch (RuntimeException e) {
+                return "<h1>" + e.getMessage() + "</h1><a href='/cart'>Back to Cart</a>";
+            }
         });
     }//end of main method
 }//end of class
