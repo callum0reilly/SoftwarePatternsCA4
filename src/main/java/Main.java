@@ -81,9 +81,15 @@ public class Main {
             for (Product p : products) {
                 html += "<form action='/add-to-cart' method='post'>" +
                         "<input type='hidden' name='title' value='" + p.getTitle() + "'>" +
-                        "<p>" + p.getTitle() + " - €" + p.getPrice() + "</p>" +
-                        "<button type='submit'>Add to Cart</button>" +
-                        "</form>";
+                        "<p>" + p.getTitle() + " - €" + p.getPrice() + " (Stock: " + p.getStock() +")" +"</p>";
+
+            if (p.getStock() > 0) {
+                    html += "<button type='submit'>Add to Cart</button>";
+                } else {
+                    html += "<button disabled>Out of Stock</button>";
+                }
+
+                html += "</form>";
             }
 
             return html;
@@ -98,7 +104,9 @@ public class Main {
 
             for (Product p : ps.getProducts()) {
                 if (p.getTitle().equals(title)) {
-                    cs.add(p);
+                    if (p.getStock() > 0) {
+                        cs.add(p);
+                    }
                     break;
                 }
             }
