@@ -1,28 +1,187 @@
-
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
+    margin: 0;
+    padding: 30px;
+    color: #222;
+}
+
+/* Headings */
+h1 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+h2 {
     text-align: center;
 }
 
-h1 {
-    margin-top: 50px;
+/* Top section */
+.page-top {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-form {
+a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Search box */
+.search-box {
     background: white;
     padding: 20px;
-    display: inline-block;
-    border-radius: 5px;
+    border-radius: 10px;
+    width: fit-content;
+    margin: 20px auto 30px auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-input {
-    display: block;
-    margin: 10px auto;
-    padding: 8px;
+/* Inputs + buttons */
+input, select, button {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
 }
 
 button {
-    padding: 8px 15px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
     cursor: pointer;
+}
+
+button:hover {
+    background-color: #1d4ed8;
+}
+
+button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Product list */
+.product-list {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Each product */
+.product-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Product info */
+.product-card h3 {
+    margin: 0 0 10px 0;
+}
+
+.price {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.low-stock {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+/* Forms inside product */
+.cart-form {
+    margin: 10px 0;
+}
+
+.review-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 10px 0;
+}
+
+.review-form input {
+    min-width: 200px;
+}
+
+/* Reviews */
+.reviews {
+    margin-top: 10px;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+
+.review-item {
+    background: #f9fafb;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.no-reviews {
+    color: #777;
+    font-style: italic;
+}
+
+.page-top {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: fit-content;
+    margin: 20px auto 30px auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+/* Login Page */
+
+.login-page {
+    background: linear-gradient(135deg, #2563eb, #1e3a8a);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+
+.login-container {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    width: 350px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.login-container h1 {
+    margin-bottom: 20px;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+}
+
+.login-container button {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.login-container a {
+    display: block;
+    margin-top: 10px;
 }

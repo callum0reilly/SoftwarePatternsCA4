@@ -66,10 +66,12 @@ public class Main {
             //display them
             String html = "<html><head><link rel='stylesheet' href='style.css'></head><body>";
 
+            html += "<div class='page-top'>";
             html += "<h1>Home page</h1>";
+            html += "<a href='/cart'>View Cart</a>";
+            html += "</div>";
 
-            html += "<a href='/cart'>View Cart</a><br><br>";
-
+            html += "<div class='search-box'>";
             html += "<form action='/products' method='get'>" +
                     "<input type='text' name='search' placeholder='Search products'>" +
                     "<select name='sort'>" +
@@ -79,25 +81,67 @@ public class Main {
                     "</select>" +
                     "<button type='submit'>Search</button>" +
                     "</form>";
+            html += "</div>";
 
             html += "<h2>Products</h2>";
+            html += "<div class='product-list'>";
 
             for (Product p : products) {
-                String warning = p.isLowStock() ? " - LOW STOCK!" : "";
 
-                html += "<form action='/add-to-cart' method='post'>" +
-                        "<input type='hidden' name='title' value='" + p.getTitle() + "'>" +
-                        "<p>" + p.getTitle() + " - €" + p.getPrice() +
-                        " (Stock: " + p.getStock() + ")" + warning + "</p>";
+                String warning = p.isLowStock() ? "<span class='low-stock'>Low stock</span>" : "";
+
+                html += "<div class='product-card'>";
+
+                html += "<div class='product-top'>";
+                html += "<h3>" + p.getTitle() + "</h3>";
+                html += "<p class='price'>€" + p.getPrice() + "</p>";
+                html += "<p>Stock: " + p.getStock() + " " + warning + "</p>";
+                html += "</div>";
+
+                html += "<form action='/add-to-cart' method='post' class='cart-form'>";
+                html += "<input type='hidden' name='title' value='" + p.getTitle() + "'>";
 
                 if (p.getStock() > 0) {
                     html += "<button type='submit'>Add to Cart</button>";
                 } else {
-                    html += "<button disabled>Out of Stock</button>";
+                    html += "<button type='submit' disabled>Out of Stock</button>";
                 }
 
                 html += "</form>";
+
+                html += "<form action='/add-review' method='post' class='review-form'>";
+                html += "<input type='hidden' name='title' value='" + p.getTitle() + "'>";
+                html += "<label for='rating'>Rating</label>";
+                html += "<select name='rating'>";
+                html += "<option value='1'>1</option>";
+                html += "<option value='2'>2</option>";
+                html += "<option value='3'>3</option>";
+                html += "<option value='4'>4</option>";
+                html += "<option value='5'>5</option>";
+                html += "</select>";
+                html += "<input type='text' name='comment' placeholder='Write a review'>";
+                html += "<button type='submit'>Submit Review</button>";
+                html += "</form>";
+
+                List<Review> reviews = ReviewService.getInstance().getReviewsForProduct(p.getTitle());
+
+                html += "<div class='reviews'>";
+                if (reviews.isEmpty()) {
+                    html += "<p class='no-reviews'>No reviews yet</p>";
+                } else {
+                    for (Review r : reviews) {
+                        html += "<div class='review-item'>";
+                        html += "<strong>Rating: " + r.getRating() + "/5</strong>";
+                        html += "<p>" + r.getComment() + "</p>";
+                        html += "</div>";
+                    }
+                }
+                html += "</div>";
+
+                html += "</div>";
             }
+
+            html += "</div>";
             html += "</body></html>";
             return html;
         });
@@ -153,6 +197,18 @@ public class Main {
                 return "<h1>" + e.getMessage() + "</h1><a href='/cart'>Back to Cart</a>";
             }
         });
+
+        post("/add-review", (req, res) -> {
+
+            String title = req.queryParams("title");
+            int rating = Integer.parseInt(req.queryParams("rating"));
+            String comment = req.queryParams("comment");
+
+            ReviewService.getInstance().addReview(title, rating, comment);
+
+            res.redirect("/products");
+            return null;
+        });//end of add review
 
         get("/admin", (req, res) -> {
 
