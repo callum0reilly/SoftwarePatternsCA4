@@ -5,15 +5,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
-<h1>Login page</h1>
+<body class="login-page">
 
-<form action="/login" method="post">
-    <input type="text" name="username" placeholder="Enter name" />
-    <input type="text" name="password" placeholder="Enter password" />
-    <button type="submit">Submit</button>
-</form>
+<div class="login-container">
+    <h1>Login</h1>
 
-<a href="/register.html">Register</a>
+    <p style="color:#666; font-size:14px;">Sign in to continue</p>
+
+    <form action="/login" method="post">
+        <input type="text" name="username" placeholder="Enter name" required />
+        <input type="password" name="password" placeholder="Enter password" required />
+        <button type="submit">Login</button>
+    </form>
+
+    <a href="/register.html">Register</a>
+</div>
+
 </body>
 </html>
