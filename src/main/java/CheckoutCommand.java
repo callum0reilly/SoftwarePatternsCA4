@@ -21,6 +21,7 @@ public class CheckoutCommand implements Command {
         for (Product p : cart) {
             if (p.getStock() > 0) {
                 p.setStock(p.getStock() - 1);
+                p.notifyObservers();
             }
         }
 

@@ -83,11 +83,14 @@ public class Main {
             html += "<h2>Products</h2>";
 
             for (Product p : products) {
+                String warning = p.isLowStock() ? " - LOW STOCK!" : "";
+
                 html += "<form action='/add-to-cart' method='post'>" +
                         "<input type='hidden' name='title' value='" + p.getTitle() + "'>" +
-                        "<p>" + p.getTitle() + " - €" + p.getPrice() + " (Stock: " + p.getStock() +")" +"</p>";
+                        "<p>" + p.getTitle() + " - €" + p.getPrice() +
+                        " (Stock: " + p.getStock() + ")" + warning + "</p>";
 
-            if (p.getStock() > 0) {
+                if (p.getStock() > 0) {
                     html += "<button type='submit'>Add to Cart</button>";
                 } else {
                     html += "<button disabled>Out of Stock</button>";
@@ -95,7 +98,7 @@ public class Main {
 
                 html += "</form>";
             }
-
+            html += "</body></html>";
             return html;
         });
 
@@ -159,9 +162,12 @@ public class Main {
             html += "<a href='/products'>Go to shop</a><br><br>";
 
             for (Product p : products) {
+
+                String warning = p.isLowStock() ? " - LOW STOCK!" : "";
+
                 html += "<form action='/update-stock' method='post'>" +
                         "<input type='hidden' name='title' value='" + p.getTitle() + "'>" +
-                        "<p>" + p.getTitle() + " - Stock: " + p.getStock() + "</p>" +
+                        "<p>" + p.getTitle() + " - Stock: " + p.getStock() + warning + "</p>" +
                         "<input type='number' name='stock' placeholder='New stock'>" +
                         "<button type='submit'>Update</button>" +
                         "</form>";

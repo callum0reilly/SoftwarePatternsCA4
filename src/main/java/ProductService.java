@@ -31,7 +31,10 @@ public class ProductService {
             double price = ((Number) doc.get("price")).doubleValue();
             int stock = ((Number) doc.get("stock")).intValue();
 
-            products.add(factory.createProduct(title, price, stock));
+            Product p = factory.createProduct(title, price, stock);
+            p.addObserver(new LowStockObserver());
+            p.notifyObservers();
+            products.add(p);
         }
         return products;
     }//end of getProducts
@@ -41,5 +44,12 @@ public class ProductService {
                 new Document("title", title),
                 new Document("$set", new Document("stock", newStock))
         );
+
+        for (Product p : getProducts()) {
+            if (p.getTitle().equals(title)) {
+                p.notifyObservers();
+                break;
+            }
+        }
     }
 }
