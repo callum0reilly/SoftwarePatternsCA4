@@ -24,11 +24,15 @@ public class Main {
             User user = userService.findUser(username);
 
             if (user != null && user.getPassword().equals(password)) {
-                res.redirect("/ShoppingHomePage.html");
-                return null ;
-            } else {
-                return "Invalid username or password";
+
+                if (user.getRole().equals("admin")) {
+                    res.redirect("/admin");
+                } else {
+                    res.redirect("/ShoppingHomePage.html");
+                }
+                return null;
             }
+            return "Invalid username or password";
 
         });//end of /login
 
@@ -146,6 +150,36 @@ public class Main {
                 return "<h1>" + e.getMessage() + "</h1><a href='/cart'>Back to Cart</a>";
             }
         });
+
+        get("/admin", (req, res) -> {
+
+            List<Product> products = ProductService.getInstance().getProducts();
+
+            String html = "<h1>Admin Panel</h1>";
+            html += "<a href='/products'>Go to shop</a><br><br>";
+
+            for (Product p : products) {
+                html += "<form action='/update-stock' method='post'>" +
+                        "<input type='hidden' name='title' value='" + p.getTitle() + "'>" +
+                        "<p>" + p.getTitle() + " - Stock: " + p.getStock() + "</p>" +
+                        "<input type='number' name='stock' placeholder='New stock'>" +
+                        "<button type='submit'>Update</button>" +
+                        "</form>";
+            }
+
+            return html;
+        }); //end of admin
+
+        post("/update-stock", (req, res) -> {
+
+            String title = req.queryParams("title");
+            int stock = Integer.parseInt(req.queryParams("stock"));
+
+            ProductService.getInstance().updateStock(title, stock);
+
+            res.redirect("/admin");
+            return null;
+        });//end of update stock
     }//end of main method
 }//end of class
 
