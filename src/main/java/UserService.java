@@ -1,16 +1,19 @@
 import java.util.ArrayList;
 import java.util.List;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 
 public class UserService {
 
     private static UserService instance;
-
-    private List<User> users;
+    private MongoCollection<Document> collection;
+    private UserFactory factory;
 
     private UserService() {
-        users = new ArrayList<>();
-        users.add(new User("Callum", "123456", "customer"));
-        users.add(new User("admin", "admin123", "admin"));
+        MongoDatabase db = MongoDBConnection.getInstance().getDatabase();
+        collection = db.getCollection("users");
+        factory = new DefaultUserFactory();
     }
 
     public static UserService getInstance() {
@@ -21,11 +24,28 @@ public class UserService {
     }
 
     public User findUser(String username) {
-        for (User user : users) {
-            if (user.getUsername().equals(username)) {
-                return user;
-            }
-        }
-        return null;
+
+        Document doc = collection.find(new Document("username", username)).first();
+
+        if (doc == null) return null;
+
+        return factory.createUser(
+                doc.getString("username"),
+                doc.getString("password"),
+                doc.getString("role"),
+                doc.getString("address"),
+                doc.getString("payment")
+        );
+    }//end of findUser
+
+    public void registerUser(String username, String password, String address, String payment) {
+
+        Document doc = new Document("username", username)
+                .append("password", password)
+                .append("role", "customer")
+                .append("address", address)
+                .append("payment", payment);
+
+        collection.insertOne(doc);
     }
 }
