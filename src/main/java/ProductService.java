@@ -5,12 +5,14 @@ import org.bson.Document;
 
 public class ProductService {
 
+    private ProductFactory factory;
     private static ProductService instance;
     private MongoCollection<Document> collection;
 
     private ProductService() {
         MongoDatabase db = MongoDBConnection.getInstance().getDatabase();
         collection = db.getCollection("products");
+        factory = new DefaultProductFactory();
     }
 
     public static ProductService getInstance() {
@@ -29,7 +31,7 @@ public class ProductService {
             double price = ((Number) doc.get("price")).doubleValue();
             int stock = ((Number) doc.get("stock")).intValue();
 
-            products.add(new Product(title, price, stock));
+            products.add(factory.createProduct(title, price, stock));
         }
         return products;
     }//end of getProducts
