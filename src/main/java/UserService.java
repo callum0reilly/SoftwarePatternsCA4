@@ -9,7 +9,8 @@ public class UserService {
 
     private UserService() {
         users = new ArrayList<>();
-        users.add(new User("Callum", "123456"));
+        users.add(new User("Callum", "123456", "customer"));
+        users.add(new User("admin", "admin123", "admin"));
     }
 
     public static UserService getInstance() {
