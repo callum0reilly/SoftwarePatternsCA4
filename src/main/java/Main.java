@@ -45,8 +45,13 @@ public class Main {
 
             //search
             if (search != null && !search.isEmpty()) {
+                String s = search.toLowerCase();
                 products.removeIf(p ->
-                        !p.getTitle().toLowerCase().contains(search.toLowerCase())
+                        !(
+                                        p.getTitle().toLowerCase().contains(s) ||
+                                        p.getCategory().toLowerCase().contains(s) ||
+                                        p.getManufacturer().toLowerCase().contains(s)
+                        )
                 );
             }
 
@@ -95,6 +100,8 @@ public class Main {
                 html += "<div class='product-top'>";
                 html += "<h3>" + p.getTitle() + "</h3>";
                 html += "<p class='price'>€" + p.getPrice() + "</p>";
+                html += "<p>Category: " + p.getCategory() + "</p>";
+                html += "<p>Brand: " + p.getManufacturer() + "</p>";
                 html += "<p>Stock: " + p.getStock() + " " + warning + "</p>";
                 html += "</div>";
 

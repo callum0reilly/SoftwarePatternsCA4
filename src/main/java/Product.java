@@ -6,12 +6,16 @@ public class Product {
     private double price;
     private int stock;
     private boolean lowStock = false;
+    private String category;
+    private String manufacturer;
     private List<StockObserver> observers = new ArrayList<>();
 
-    public Product(String title, double price,int stock) {
+    public Product(String title, double price, int stock, String category, String manufacturer) {
         this.title = title;
         this.price = price;
-        this.stock= stock;
+        this.stock = stock;
+        this.category = category;
+        this.manufacturer = manufacturer;
     }//end of constructore
 
     public String getTitle() {
@@ -46,5 +50,13 @@ public class Product {
 
     public void setLowStock(boolean lowStock) {
         this.lowStock = lowStock;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getManufacturer() {
+        return manufacturer;
     }
 }//end of class
