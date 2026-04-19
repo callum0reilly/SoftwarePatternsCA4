@@ -186,6 +186,19 @@ public class Main {
             res.redirect("/admin");
             return null;
         });//end of update stock
+
+        post("/register", (req, res) -> {
+
+            String username = req.queryParams("username");
+            String password = req.queryParams("password");
+            String address = req.queryParams("address");
+            String payment = req.queryParams("payment");
+
+            UserService.getInstance().registerUser(username, password, address, payment);
+
+            res.redirect("/login.html");
+            return null;
+        });//end of register
     }//end of main method
 }//end of class
 
