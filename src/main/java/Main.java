@@ -229,14 +229,34 @@ public class Main {
         });//end of add review
 
         get("/admin", (req, res) -> {
+            User user = req.session().attribute("user");
 
-            List<Product> products = ProductService.getInstance().getProducts();
+            if (user == null || !user.getRole().equals("admin")) {
+                res.redirect("/login.html");
+                return null;
+            }
 
             String html = "<h1>Admin Panel</h1>";
             html += "<a href='/products'>Go to shop</a><br><br>";
 
+            html += "<h2>Add Product</h2>";
+            html += "<form action='/add-product' method='post'>" +
+                    "<input type='text' name='title' placeholder='Title' required>" +
+                    "<input type='number' step='0.01' name='price' placeholder='Price' required>" +
+                    "<input type='number' name='stock' placeholder='Stock' required>" +
+                    "<input type='text' name='category' placeholder='Category' required>" +
+                    "<input type='text' name='manufacturer' placeholder='Manufacturer' required>" +
+                    "<button type='submit'>Add Product</button>" +
+                    "</form><br>";
+
+            List<Product> products = ProductService.getInstance().getProducts();
             for (Product p : products) {
 
+                //delete product button
+                html += "<form action='/delete-product' method='post' onsubmit='return confirm(\"Are you sure?\")'>" +
+                        "<input type='hidden' name='title' value='" + p.getTitle() + "'>" +
+                        "<button type='submit'>Delete</button>" +
+                        "</form>";
                 String warning = p.isLowStock() ? " - LOW STOCK!" : "";
 
                 html += "<form action='/update-stock' method='post'>" +
@@ -292,6 +312,30 @@ public class Main {
             res.redirect("/login.html");
             return null;
         });//end of register
+
+        post("/add-product", (req, res) -> {
+
+            String title = req.queryParams("title");
+            double price = Double.parseDouble(req.queryParams("price"));
+            int stock = Integer.parseInt(req.queryParams("stock"));
+            String category = req.queryParams("category");
+            String manufacturer = req.queryParams("manufacturer");
+
+            ProductService.getInstance().addProduct(title, price, stock, category, manufacturer);
+
+            res.redirect("/admin");
+            return null;
+        });//end of add product
+
+        post("/delete-product", (req, res) -> {
+
+            String title = req.queryParams("title");
+
+            ProductService.getInstance().deleteProduct(title);
+
+            res.redirect("/admin");
+            return null;
+        });//end of delete product
     }//end of main method
 }//end of class
 
