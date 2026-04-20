@@ -2,6 +2,8 @@
 import static spark.Spark.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 
 public class Main {
     public static void main(String[] args) {
@@ -243,6 +245,25 @@ public class Main {
                         "<input type='number' name='stock' placeholder='New stock'>" +
                         "<button type='submit'>Update</button>" +
                         "</form>";
+            }
+
+            html += "<h2>Orders</h2>";
+
+            List<Document> orders = OrderService.getInstance().getAllOrders();
+
+            for (Document o : orders) {
+                html += "<div class='product-card'>";
+                html += "<p><strong>User:</strong> " + o.getString("username") + "</p>";
+
+                List<String> items = (List<String>) o.get("items");
+
+                html += "<ul>";
+                for (String item : items) {
+                    html += "<li>" + item + "</li>";
+                }
+                html += "</ul>";
+
+                html += "</div>";
             }
 
             return html;

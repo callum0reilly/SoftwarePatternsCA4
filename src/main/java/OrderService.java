@@ -34,4 +34,8 @@ public class OrderService {
 
         collection.insertOne(doc);
     }
+
+    public List<Document> getAllOrders() {
+        return collection.find().into(new ArrayList<>());
+    }
 }
