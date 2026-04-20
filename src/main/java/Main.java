@@ -261,7 +261,15 @@ public class Main {
             }
             try {
                 checkout.execute();
-                return "<h1>Purchase successful</h1><a href='/products'>Continue</a>";
+                return "<html><head><link rel='stylesheet' href='style.css'></head><body>" +
+                        "<div style='max-width:500px; margin:100px auto; text-align:center;'>" +
+                        "<div class='product-card'>" +
+                        "<h1 style='color:#16a34a;'>✓ Purchase Successful</h1>" +
+                        "<p style='color:#555; margin:16px 0;'>Your order has been placed and stock has been updated.</p>" +
+                        "<div style='display:flex; justify-content:center;'><a href='/products'><button>Continue Shopping</button></a></div>" +
+                        "</div>" +
+                        "</div>" +
+                        "</body></html>";
             } catch (RuntimeException e) {
                 return "<h1>" + e.getMessage() + "</h1><a href='/cart'>Back to Cart</a>";
             }
