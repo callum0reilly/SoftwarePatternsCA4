@@ -24,11 +24,12 @@ public class Main {
             User user = userService.findUser(username);
 
             if (user != null && user.getPassword().equals(password)) {
+                req.session().attribute("user", user);
 
                 if (user.getRole().equals("admin")) {
                     res.redirect("/admin");
                 } else {
-                    res.redirect("/ShoppingHomePage.html");
+                    res.redirect("/products");
                 }
                 return null;
             }
@@ -131,6 +132,11 @@ public class Main {
                 html += "</form>";
 
                 List<Review> reviews = ReviewService.getInstance().getReviewsForProduct(p.getTitle());
+                double avg = ReviewService.getInstance().getAverageRating(p.getTitle());
+
+                if (!reviews.isEmpty()) {
+                    html += "<p><strong>Average Rating: " + String.format("%.1f", avg) + " / 5</strong></p>";
+                }
 
                 html += "<div class='reviews'>";
                 if (reviews.isEmpty()) {
@@ -138,7 +144,7 @@ public class Main {
                 } else {
                     for (Review r : reviews) {
                         html += "<div class='review-item'>";
-                        html += "<strong>Rating: " + r.getRating() + "/5</strong>";
+                        html += "<strong>" + r.getUsername() + ": " + r.getRating() + "/5</strong>";
                         html += "<p>" + r.getComment() + "</p>";
                         html += "</div>";
                     }
@@ -210,8 +216,10 @@ public class Main {
             String title = req.queryParams("title");
             int rating = Integer.parseInt(req.queryParams("rating"));
             String comment = req.queryParams("comment");
+            User user = req.session().attribute("user");
+            String username = (user != null) ? user.getUsername() : "Guest";
 
-            ReviewService.getInstance().addReview(title, rating, comment);
+            ReviewService.getInstance().addReview(title, rating, comment, username);
 
             res.redirect("/products");
             return null;

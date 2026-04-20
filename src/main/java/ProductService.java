@@ -30,8 +30,10 @@ public class ProductService {
             String title = doc.getString("title");
             double price = ((Number) doc.get("price")).doubleValue();
             int stock = ((Number) doc.get("stock")).intValue();
+            String category = doc.getString("category");
+            String manufacturer = doc.getString("manufacturer");
 
-            Product p = factory.createProduct(title, price, stock);
+            Product p = factory.createProduct(title, price, stock,category,manufacturer);
             p.addObserver(new LowStockObserver());
             p.notifyObservers();
             products.add(p);

@@ -22,10 +22,11 @@ public class ReviewService {
         return instance;
     }
 
-    public void addReview(String productTitle, int rating, String comment) {
+    public void addReview(String productTitle, int rating, String comment,String username) {
         Document doc = new Document("productTitle", productTitle)
                 .append("rating", rating)
-                .append("comment", comment);
+                .append("comment", comment)
+                .append("username", username);
 
         collection.insertOne(doc);
     }
@@ -38,10 +39,26 @@ public class ReviewService {
             reviews.add(new Review(
                     doc.getString("productTitle"),
                     doc.getInteger("rating"),
-                    doc.getString("comment")
+                    doc.getString("comment"),
+                    doc.getString("username")
             ));
         }
 
         return reviews;
+    }
+
+    public double getAverageRating(String productTitle) {
+
+        List<Review> reviews = getReviewsForProduct(productTitle);
+
+        if (reviews.isEmpty()) return 0;
+
+        int total = 0;
+
+        for (Review r : reviews) {
+            total += r.getRating();
+        }
+
+        return (double) total / reviews.size();
     }
 }
