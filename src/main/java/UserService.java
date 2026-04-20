@@ -48,4 +48,18 @@ public class UserService {
 
         collection.insertOne(doc);
     }
+
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        for (Document doc : collection.find()) {
+            users.add(factory.createUser(
+                    doc.getString("username"),
+                    doc.getString("password"),
+                    doc.getString("role"),
+                    doc.getString("address"),
+                    doc.getString("payment")
+            ));
+        }
+        return users;
+    }
 }

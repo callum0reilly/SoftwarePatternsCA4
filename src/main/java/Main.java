@@ -258,65 +258,100 @@ public class Main {
                 return null;
             }
 
-            String html = "<h1>Admin Panel</h1>";
-            html += "<a href='/products'>Go to shop</a><br><br>";
-
-            html += "<h2>Add Product</h2>";
-            html += "<form action='/add-product' method='post'>" +
-                    "<input type='text' name='title' placeholder='Title' required>" +
-                    "<input type='number' step='0.01' name='price' placeholder='Price' required>" +
-                    "<input type='number' name='stock' placeholder='Stock' required>" +
-                    "<input type='text' name='category' placeholder='Category' required>" +
-                    "<input type='text' name='manufacturer' placeholder='Manufacturer' required>" +
-                    "<button type='submit'>Add Product</button>" +
-                    "</form><br>";
-
             List<Product> products = ProductService.getInstance().getProducts();
+            String html = "<html><head><link rel='stylesheet' href='style.css'></head><body>";
+            html += "<div class='page-top'>";
+            html += "<h1>Admin Panel</h1>";
+            html += "<a href='/products'>Go to shop</a>";
+            html += "</div>";
+
+            html += "<div class='admin-grid'>";
+            // ADD PRODUCT
+            html += "<div class='admin-section'>";
+            html += "<h2>Add Product</h2>";
+            html += "<form action='/add-product' method='post' class='admin-form'>";
+            html += "<input type='text' name='title' placeholder='Title' required>";
+            html += "<input type='number' step='0.01' name='price' placeholder='Price' required>";
+            html += "<input type='number' name='stock' placeholder='Stock' required>";
+            html += "<input type='text' name='category' placeholder='Category' required>";
+            html += "<input type='text' name='manufacturer' placeholder='Manufacturer' required>";
+            html += "<button type='submit'>Add Product</button>";
+            html += "</form>";
+            html += "</div>";
+
+            // MANAGE STOCK
+            html += "<div class='admin-section'>";
+            html += "<h2>Manage Stock</h2>";
+
             for (Product p : products) {
-
-                //delete product button
-                html += "<form action='/delete-product' method='post' onsubmit='return confirm(\"Are you sure?\")'>" +
-                        "<input type='hidden' name='title' value='" + p.getTitle() + "'>" +
-                        "<button type='submit'>Delete</button>" +
-                        "</form>";
-                String warning = p.isLowStock() ? " - LOW STOCK!" : "";
-
-                html += "<form action='/update-stock' method='post'>" +
-                        "<input type='hidden' name='title' value='" + p.getTitle() + "'>" +
-                        "<p>" + p.getTitle() + " - Stock: " + p.getStock() + warning + "</p>" +
-                        "<input type='number' name='stock' placeholder='New stock'>" +
-                        "<button type='submit'>Update</button>" +
-                        "</form>";
+                String warning = p.isLowStock() ? " <span class='low-stock'>LOW STOCK</span>" : "";
+                html += "<div class='product-card'>";
+                html += "<p><strong>" + p.getTitle() + "</strong> — Stock: " + p.getStock() + warning + "</p>";
+                html += "<div class='admin-actions'>";
+                html += "<form action='/update-stock' method='post' class='inline-form'>";
+                html += "<input type='hidden' name='title' value='" + p.getTitle() + "'>";
+                html += "<input type='number' name='stock' placeholder='New stock'>";
+                html += "<button type='submit'>Update</button>";
+                html += "</form>";
+                html += "<form action='/delete-product' method='post' class='inline-form' onsubmit='return confirm(\"Are you sure?\")'>";
+                html += "<input type='hidden' name='title' value='" + p.getTitle() + "'>";
+                html += "<button type='submit' class='btn-danger'>Delete</button>";
+                html += "</form>";
+                html += "</div>";
+                html += "</div>";
             }
 
+            html += "</div>";
+            html += "</div>"; // end admin-grid
+
+            // CUSTOMERS
+            html += "<div class='admin-section wide-section'>";
+            html += "<h2>Customers</h2>";
+            html += "<div class='product-list'>";
+
+            List<User> users = UserService.getInstance().getAllUsers();
+            for (User u : users) {
+                if (u.getRole().equals("customer")) {
+                    html += "<div class='product-card'>";
+                    html += "<p><strong>Username:</strong> " + u.getUsername() + "</p>";
+                    html += "<p><strong>Address:</strong> " + u.getAddress() + "</p>";
+                    html += "<p><strong>Payment Method:</strong> " + u.getPayment() + "</p>";
+                    html += "</div>";
+                }
+            }
+
+            html += "</div></div>";
+
+            // ORDERS
+            html += "<div class='admin-section wide-section'>";
             html += "<h2>Orders</h2>";
+            html += "<div class='product-list'>";
 
             List<Document> orders = OrderService.getInstance().getAllOrders();
-
             for (Document o : orders) {
                 html += "<div class='product-card'>";
                 html += "<p><strong>User:</strong> " + o.getString("username") + "</p>";
-
                 List<String> items = (List<String>) o.get("items");
-
                 html += "<ul>";
                 for (String item : items) {
                     html += "<li>" + item + "</li>";
                 }
                 html += "</ul>";
-
                 html += "</div>";
             }
 
+            html += "</div></div>";
+            html += "</body></html>";
             return html;
-        }); //end of admin
+        }); // end of admin
 
         post("/update-stock", (req, res) -> {
 
             String title = req.queryParams("title");
             int stock = Integer.parseInt(req.queryParams("stock"));
 
-            ProductService.getInstance().updateStock(title, stock);
+            User user = req.session().attribute("user");
+            new AdminProxy(user).updateStock(title, stock);
 
             res.redirect("/admin");
             return null;
@@ -343,7 +378,8 @@ public class Main {
             String category = req.queryParams("category");
             String manufacturer = req.queryParams("manufacturer");
 
-            ProductService.getInstance().addProduct(title, price, stock, category, manufacturer);
+            User user = req.session().attribute("user");
+            new AdminProxy(user).addProduct(title, price, stock, category, manufacturer);
 
             res.redirect("/admin");
             return null;
@@ -353,7 +389,8 @@ public class Main {
 
             String title = req.queryParams("title");
 
-            ProductService.getInstance().deleteProduct(title);
+            User user = req.session().attribute("user");
+            new AdminProxy(user).deleteProduct(title);
 
             res.redirect("/admin");
             return null;
