@@ -102,7 +102,16 @@ public class Main {
 
                 html += "<div class='product-top'>";
                 html += "<h3>" + p.getTitle() + "</h3>";
-                html += "<p class='price'>€" + p.getPrice() + "</p>";
+                double original = p.getPrice(); //original object
+                double finalPrice = original;
+
+                if (original > 50) {
+                    finalPrice = new DiscountDecorator(p).getPrice();
+                    html += "<p class='price'>€" + finalPrice +
+                            " <span style='text-decoration:line-through;'>€" + original + "</span></p>";
+                } else {
+                    html += "<p class='price'>€" + original + "</p>";
+                }
                 html += "<p>Category: " + p.getCategory() + "</p>";
                 html += "<p>Brand: " + p.getManufacturer() + "</p>";
                 html += "<p>Stock: " + p.getStock() + " " + warning + "</p>";
@@ -205,7 +214,20 @@ public class Main {
 
             Command checkout = new CheckoutCommand(cs.getCart());
             User user = req.session().attribute("user");
-            OrderService.getInstance().saveOrder(user.getUsername(), cs.getCart());
+            List<Product> cart = cs.getCart();
+
+            List<Double> finalPrices = new ArrayList<>();
+
+            for (Product p : cart) {
+                PriceComponent price = p;
+
+                //apply discount if price > 50
+                if (p.getPrice() > 50) {
+                    price = new DiscountDecorator(price);
+                }
+
+                finalPrices.add(price.getPrice());
+            }
             try {
                 checkout.execute();
                 return "<h1>Purchase successful</h1><a href='/products'>Continue</a>";

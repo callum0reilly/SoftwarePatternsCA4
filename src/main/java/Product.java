@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Product {
+public class Product implements PriceComponent{
     private String title;
     private double price;
     private int stock;
