@@ -14,16 +14,14 @@ public class Main {
         staticFiles.location("/public");
 
         get("/", (req, res) -> {
-            res.redirect("/login.html");
+            res.redirect("/index.html");
             return null;
         });
 
         post("/login",(req,res) -> {
             String username = req.queryParams("username");
             String password = req.queryParams("password");
-            UserService userService = UserService.getInstance();
-
-            User user = userService.findUser(username);
+            User user = StoreFacade.getInstance().findUser(username);
 
             if (user != null && user.getPassword().equals(password)) {
                 req.session().attribute("user", user);
@@ -44,7 +42,7 @@ public class Main {
             String search = req.queryParams("search");
             String sort = req.queryParams("sort");
 
-            List<Product> products = new ArrayList<>(ProductService.getInstance().getProducts());
+            List<Product> products = new ArrayList<>(StoreFacade.getInstance().getProducts());
 
             //search
             if (search != null && !search.isEmpty()) {
@@ -142,8 +140,8 @@ public class Main {
                 html += "<button type='submit'>Submit Review</button>";
                 html += "</form>";
 
-                List<Review> reviews = ReviewService.getInstance().getReviewsForProduct(p.getTitle());
-                double avg = ReviewService.getInstance().getAverageRating(p.getTitle());
+                List<Review> reviews = StoreFacade.getInstance().getReviewsForProduct(p.getTitle());
+                double avg = StoreFacade.getInstance().getAverageRating(p.getTitle());
 
                 if (!reviews.isEmpty()) {
                     html += "<p><strong>Average Rating: " + String.format("%.1f", avg) + " / 5</strong></p>";
@@ -174,13 +172,11 @@ public class Main {
 
             String title = req.queryParams("title");
 
-            ProductService ps = ProductService.getInstance();
-            CartService cs = CartService.getInstance();
-
-            for (Product p : ps.getProducts()) {
+            StoreFacade facade = StoreFacade.getInstance();
+            for (Product p : facade.getProducts()) {
                 if (p.getTitle().equals(title)) {
                     if (p.getStock() > 0) {
-                        cs.add(p);
+                        facade.addToCart(p);
                     }
                     break;
                 }
@@ -192,29 +188,64 @@ public class Main {
 
         get("/cart", (req, res) -> {
 
-            List<Product> cart = CartService.getInstance().getCart();
+            List<Product> cart = StoreFacade.getInstance().getCart();
 
-            String html = "<h1>Cart</h1>";
-            html += "<a href='/products'>Back</a><br><br>";
+            String html = "<html><head><link rel='stylesheet' href='style.css'></head><body>";
 
-            for (Product p : cart) {
-                html += "<p>" + p.getTitle() + " - €" + p.getPrice() + "</p>";
+            html += "<div class='page-top'>";
+            html += "<h1>Cart</h1>";
+            html += "<a href='/products'>Back to Shop</a>";
+            html += "</div>";
+
+            html += "<div class='product-list'>";
+
+            if (cart.isEmpty()) {
+                html += "<p style='text-align:center; color:#777;'>Your cart is empty.</p>";
+            } else {
+                double total = 0;
+
+                for (Product p : cart) {
+                    double price = p.getPrice();
+                    if (price > 50) {
+                        price = new DiscountDecorator(p).getPrice();
+                    }
+                    total += price;
+
+                    html += "<div class='product-card'>";
+                    html += "<p><strong>" + p.getTitle() + "</strong></p>";
+                    if (p.getPrice() > 50) {
+                        html += "<p class='price'>€" + price +
+                                " <span style='text-decoration:line-through; color:#999;'>€" + p.getPrice() + "</span></p>";
+                    } else {
+                        html += "<p class='price'>€" + price + "</p>";
+                    }
+                    html += "</div>";
+                }
+
+                html += "<div class='product-card'>";
+                html += "<p><strong>Total: €" + String.format("%.2f", total) + "</strong></p>";
+                html += "</div>";
             }
 
-            html += "<form action='/checkout' method='post'>" +
-                    "<button type='submit'>Checkout</button>" +
-                    "</form>";
+            html += "</div>";
 
+            html += "<div style='text-align:center; margin-top:20px;'>";
+            html += "<form action='/checkout' method='post'>";
+            html += "<button type='submit'>Checkout</button>";
+            html += "</form>";
+            html += "</div>";
+
+            html += "</body></html>";
             return html;
         });
 
         post("/checkout", (req, res) -> {
 
-            CartService cs = CartService.getInstance();
+            StoreFacade facade = StoreFacade.getInstance();
 
-            Command checkout = new CheckoutCommand(cs.getCart(), new StandardCheckout());
+            Command checkout = new CheckoutCommand(facade.getCart(), new StandardCheckout());
             User user = req.session().attribute("user");
-            List<Product> cart = cs.getCart();
+            List<Product> cart = facade.getCart();
 
             List<Double> finalPrices = new ArrayList<>();
 
@@ -244,7 +275,7 @@ public class Main {
             User user = req.session().attribute("user");
             String username = (user != null) ? user.getUsername() : "Guest";
 
-            ReviewService.getInstance().addReview(title, rating, comment, username);
+            StoreFacade.getInstance().addReview(title, rating, comment, username);
 
             res.redirect("/products");
             return null;
@@ -254,11 +285,11 @@ public class Main {
             User user = req.session().attribute("user");
 
             if (user == null || !user.getRole().equals("admin")) {
-                res.redirect("/login.html");
+                res.redirect("/index.html");
                 return null;
             }
 
-            List<Product> products = ProductService.getInstance().getProducts();
+            List<Product> products = StoreFacade.getInstance().getProducts();
             String html = "<html><head><link rel='stylesheet' href='style.css'></head><body>";
             html += "<div class='page-top'>";
             html += "<h1>Admin Panel</h1>";
@@ -309,7 +340,7 @@ public class Main {
             html += "<h2>Customers</h2>";
             html += "<div class='product-list'>";
 
-            List<User> users = UserService.getInstance().getAllUsers();
+            List<User> users = StoreFacade.getInstance().getAllUsers();
             for (User u : users) {
                 if (u.getRole().equals("customer")) {
                     html += "<div class='product-card'>";
@@ -327,7 +358,7 @@ public class Main {
             html += "<h2>Orders</h2>";
             html += "<div class='product-list'>";
 
-            List<Document> orders = OrderService.getInstance().getAllOrders();
+            List<Document> orders = StoreFacade.getInstance().getAllOrders();
             for (Document o : orders) {
                 html += "<div class='product-card'>";
                 html += "<p><strong>User:</strong> " + o.getString("username") + "</p>";
@@ -364,9 +395,9 @@ public class Main {
             String address = req.queryParams("address");
             String payment = req.queryParams("payment");
 
-            UserService.getInstance().registerUser(username, password, address, payment);
+            StoreFacade.getInstance().registerUser(username, password, address, payment);
 
-            res.redirect("/login.html");
+            res.redirect("/index.html");
             return null;
         });//end of register
 

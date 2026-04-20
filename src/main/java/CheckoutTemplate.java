@@ -21,7 +21,9 @@ public abstract class CheckoutTemplate {
     private void updateStock(List<Product> cart) {
         for (Product p : cart) {
             if (p.getStock() > 0) {
-                p.setStock(p.getStock() - 1);
+                int newStock = p.getStock() - 1;
+                p.setStock(newStock);
+                ProductService.getInstance().updateStock(p.getTitle(), newStock);
                 p.notifyObservers();
             }
         }
