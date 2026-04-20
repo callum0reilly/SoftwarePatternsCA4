@@ -54,4 +54,19 @@ public class ProductService {
             }
         }
     }
+
+    public void addProduct(String title, double price, int stock, String category, String manufacturer) {
+
+        Document doc = new Document("title", title)
+                .append("price", price)
+                .append("stock", stock)
+                .append("category", category)
+                .append("manufacturer", manufacturer);
+
+        collection.insertOne(doc);
+    }
+
+    public void deleteProduct(String title) {
+        collection.deleteOne(new Document("title", title));
+    }
 }
