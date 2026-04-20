@@ -202,7 +202,8 @@ public class Main {
             CartService cs = CartService.getInstance();
 
             Command checkout = new CheckoutCommand(cs.getCart());
-
+            User user = req.session().attribute("user");
+            OrderService.getInstance().saveOrder(user.getUsername(), cs.getCart());
             try {
                 checkout.execute();
                 return "<h1>Purchase successful</h1><a href='/products'>Continue</a>";
