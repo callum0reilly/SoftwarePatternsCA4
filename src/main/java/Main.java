@@ -212,7 +212,7 @@ public class Main {
 
             CartService cs = CartService.getInstance();
 
-            Command checkout = new CheckoutCommand(cs.getCart());
+            Command checkout = new CheckoutCommand(cs.getCart(), new StandardCheckout());
             User user = req.session().attribute("user");
             List<Product> cart = cs.getCart();
 
